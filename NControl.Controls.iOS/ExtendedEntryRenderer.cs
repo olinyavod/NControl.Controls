@@ -1,5 +1,4 @@
-﻿using System;
-using Xamarin.Forms.Platform.iOS;
+﻿using Xamarin.Forms.Platform.iOS;
 using UIKit;
 using Xamarin.Forms;
 using NControl.Controls;
@@ -14,13 +13,13 @@ namespace NControl.Controls.iOS
 		/// Raises the element changed event.
 		/// </summary>
 		/// <param name="e">E.</param>
-		protected override void OnElementChanged (ElementChangedEventArgs<Xamarin.Forms.Entry> e)
+		protected override void OnElementChanged (ElementChangedEventArgs<Entry> e)
 		{
 			base.OnElementChanged (e);
 
             if (Control != null && e.NewElement != null) 
 			{
-				var textfield = Control as UITextField;
+				var textfield = Control;
 				textfield.BorderStyle = UITextBorderStyle.None;
                 UpdateFont(e.NewElement as ExtendedEntry);
 			}
@@ -52,8 +51,8 @@ namespace NControl.Controls.iOS
             if (string.IsNullOrEmpty(element.FontFamily))
                 return;
             
-			(Control as UITextField).Font = UIFont.FromName (element.FontFamily, 
-				(Control as UITextField).Font.PointSize);
+			Control.Font = UIFont.FromName (element.FontFamily, 
+				Control.Font.PointSize);
 		}
 
 		/// <summary>
@@ -64,7 +63,22 @@ namespace NControl.Controls.iOS
 			if (Control == null)
 				return;
 			
-			(Control as UITextField).TextAlignment = (Element as ExtendedEntry).XAlign.ToUITextAlignment ();
+			Control.TextAlignment = ToUITextAlignment(((ExtendedEntry) Element).XAlign);
+		}
+
+		static UITextAlignment ToUITextAlignment(TextAlignment alignment)
+		{
+			switch (alignment)
+			{
+				case TextAlignment.Center:
+					return UITextAlignment.Center;
+				case TextAlignment.End:
+					return UITextAlignment.Right;
+				case TextAlignment.Start:
+					return UITextAlignment.Left;
+				default:
+					return UITextAlignment.Natural;
+			}
 		}
 	}
 }
