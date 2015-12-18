@@ -26,6 +26,8 @@
  ************************************************************************/
 
 using System;
+using System.Windows.Input;
+using Simply.Core.Controls;
 using Xamarin.Forms;
 
 namespace NControl.Controls
@@ -39,7 +41,8 @@ namespace NControl.Controls
 		/// Initializes a new instance of the <see cref="NControl.Controls.ExtendedEntry"/> class.
 		/// </summary>
 		public ExtendedEntry ()
-		{			
+		{
+			Completed += OnCompleted;
 		}	
 
 		/// <summary>
@@ -59,30 +62,50 @@ namespace NControl.Controls
 		/// <value>The color of the buton.</value>
 		public TextAlignment XAlign {
 			get{ return (TextAlignment)GetValue (XAlignProperty); }
-			set {
-				SetValue (XAlignProperty, value);
-			}
+			set { SetValue(XAlignProperty, value); }
 		}
 
-		/// <summary>
-		/// The FontFamily property.
-		/// </summary>
-		public static BindableProperty FontFamilyProperty = 
-			BindableProperty.Create<ExtendedEntry, string> (p => p.FontFamily, null,
-                BindingMode.TwoWay, propertyChanged: (bindable, oldValue, newValue) => {
-					var ctrl = (ExtendedEntry)bindable;
-					ctrl.FontFamily = newValue;
-				});
+		private void OnCompleted(object sender, EventArgs eventArgs)
+		{
+			InvokeCompleted();
+		}
 
-		/// <summary>
-		/// Gets or sets the FontFamily of the ExtendedEntry instance.
-		/// </summary>
-		/// <value>The color of the buton.</value>
-		public string FontFamily {
-			get{ return (string)GetValue (FontFamilyProperty); }
-			set {
-				SetValue (FontFamilyProperty, value);
-			}
+		public static readonly BindableProperty IsDoneProperty = BindableProperty.Create<ExtendedEntry, bool>(m => m.IsDone, false);
+
+		public bool IsDone
+		{
+			get { return ((bool)GetValue(IsDoneProperty)); }
+			set { SetValue(IsDoneProperty, value); }
+		}
+
+		public static readonly BindableProperty DoneCommandProperty = BindableProperty.Create<ExtendedEntry, ICommand>(m => m.DoneCommand, null);
+
+		public ICommand DoneCommand
+		{
+			get { return ((ICommand)GetValue(DoneCommandProperty)); }
+			set { SetValue(DoneCommandProperty, value); }
+		}
+
+		public static readonly BindableProperty DoneCommandParameterProperty = BindableProperty.Create<ExtendedEntry, object>(m => m.DoneCommandParameter, null);
+
+		public object DoneCommandParameter
+		{
+			get { return GetValue(DoneCommandParameterProperty); }
+			set { SetValue(DoneCommandParameterProperty, value); }
+		}
+
+		public static readonly BindableProperty ReturnTypeProperty = BindableProperty.Create<ExtendedEntry, ReturnType>(m => m.ReturnType, ReturnType.None);
+
+		public ReturnType ReturnType
+		{
+			get { return ((ReturnType)GetValue(ReturnTypeProperty)); }
+			set { SetValue(ReturnTypeProperty, value); }
+		}
+
+		public void InvokeCompleted()
+		{
+			if (DoneCommand != null && DoneCommand.CanExecute(DoneCommandParameter))
+				DoneCommand.Execute(DoneCommandParameter);
 		}
 	}
 }

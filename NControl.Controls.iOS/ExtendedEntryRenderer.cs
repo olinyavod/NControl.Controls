@@ -3,6 +3,7 @@ using UIKit;
 using Xamarin.Forms;
 using NControl.Controls;
 using NControl.Controls.iOS;
+using Simply.Core.Controls;
 
 [assembly: ExportRenderer (typeof (ExtendedEntry), typeof (ExtendedEntryRenderer))]
 namespace NControl.Controls.iOS
@@ -17,15 +18,54 @@ namespace NControl.Controls.iOS
 		{
 			base.OnElementChanged (e);
 
+			var control = e.NewElement as ExtendedEntry;
+			if (e.OldElement == null)
+			{
+				SetReturnType(control);
+
+				Control.ShouldReturn += tf =>
+				{
+					if (control != null) control.InvokeCompleted();
+					return true;
+				};
+			}
+
             if (Control != null && e.NewElement != null) 
 			{
 				var textfield = Control;
 				textfield.BorderStyle = UITextBorderStyle.None;
-                UpdateFont(e.NewElement as ExtendedEntry);
+                UpdateFont(control);
+				
 			}
 
 			if (e.NewElement != null)
 				UpdateTextAlignment ();
+		}
+
+		private void SetReturnType(ExtendedEntry entry)
+		{
+			switch (entry.ReturnType)
+			{
+				case ReturnType.Go:
+					Control.ReturnKeyType = UIReturnKeyType.Go;
+					break;
+				case ReturnType.Next:
+					Control.ReturnKeyType = UIReturnKeyType.Next;
+					break;
+				case ReturnType.Send:
+					Control.ReturnKeyType = UIReturnKeyType.Send;
+					break;
+				case ReturnType.Search:
+					Control.ReturnKeyType = UIReturnKeyType.Search;
+					break;
+				case ReturnType.Done:
+					Control.ReturnKeyType = UIReturnKeyType.Done;
+					break;
+				default:
+					Control.ReturnKeyType = UIReturnKeyType.Default;
+					break;
+
+			}
 		}
 
 		/// <summary>
